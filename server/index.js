@@ -10,8 +10,14 @@ server.listen(PORT, () => {
     console.log(`listening on *:${PORT}`);
 });
 
+curTime = 0; 
+setInterval(function(){
+	curTime+=1;
+	},1000);
 io.on('connection', (socket) => { /* socket object may be used to send specific messages to the new connected client */
-
-    console.log('new client connected');
-	socket.emit('connection',null)
+    //console.log('new client connected');
+	socket.emit('connection',null);
+	setInterval(function(){
+		socket.emit('timestamp', curTime);
+	}, 1000);
 });
