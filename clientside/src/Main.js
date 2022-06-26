@@ -1,6 +1,6 @@
-import React, { useState, useContext, useCallback, useEffect } from "react";
+import React, { useState, useContext,useRef, useCallback, useEffect } from "react";
 import { SocketContext } from "./context/socket";
-//main funciton to house content
+import axios from 'axios';
 function Main() {
   const [currentTime, setCurrentTime] = useState(0);
   const [paused, setPause] = useState(false);
@@ -28,9 +28,26 @@ function Main() {
     };
   }, []);
 
+    const formRef = useRef(null);
+const submit_file = e => {
+        e.preventDefault();
+
+        const form_data = new FormData(formRef.current);
+
+        axios({
+            url: 'http://localhost:3030/8080',
+            method: 'post',
+            headers: { 'Content-Type': 'multipart/form-data' },
+            data: form_data
+        })
+            .then(res => console.log(res))
+            .catch(err => console.error(err));
+    };
+
+
   const handlePause = () => {
 	  console.log(currentTime);
-	  if(paused === true) {
+	  if(paused === true){
 		  socket.emit("pause", {bool:false,time:currentTime })
 	  } else {
 		  socket.emit("pause", {bool:true,time:currentTime})
@@ -42,6 +59,13 @@ function Main() {
     <div classname="App">
       {currentTime}
       <button onClick={handlePause}> Pause/Unpaue </button>
+    <div>
+       <form onSubmit={submit_file} ref={formRef}>
+            <input type="text" name="text" />
+            <input type="file" name="file" />
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
     </div>
   );
 }
